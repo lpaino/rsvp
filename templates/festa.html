@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="card two-col">
+  <div>
+    <h2>Cadastro da festa</h2>
+    <form method="post" class="form-grid">
+      <label>Nome da festa <input name="nome" required></label>
+      <label>Data <input type="date" name="data_evento"></label>
+      <label>Local <input name="local"></label>
+      <label>Descrição <textarea name="descricao"></textarea></label>
+      <button type="submit">Salvar festa</button>
+    </form>
+  </div>
+  <div>
+    <h2>Histórico</h2>
+    <ul>
+      {% for item in festas %}
+      <li><strong>{{ item.nome }}</strong> - {{ item.data_evento }} - {{ item.local }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endblock %}

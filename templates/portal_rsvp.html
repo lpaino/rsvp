@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="card">
+  <h2>Portal RSVP dos convidados</h2>
+  <p>Confirmados até agora: <strong>{{ total_confirmados }}</strong></p>
+
+  <form method="post" class="form-grid" id="rsvp-form">
+    <label>Seu nome (convidado principal)
+      <input name="principal" required>
+      <small class="field-status" data-status-for="principal"></small>
+    </label>
+
+    <fieldset>
+      <legend>Vai ter acompanhante?</legend>
+      <label><input type="radio" name="tem_acompanhante" value="nao" checked> Não</label>
+      <label><input type="radio" name="tem_acompanhante" value="sim"> Sim</label>
+    </fieldset>
+
+    <div id="acompanhantes-container" class="hidden">
+      <p>Adicione o nome de cada convidado acompanhante (todos devem estar na lista).</p>
+      <div id="acompanhantes-list"></div>
+      <button type="button" id="add-acompanhante">Adicionar outro acompanhante</button>
+      <small>Quando não tiver mais convidados, é só clicar em confirmar presença.</small>
+    </div>
+
+    <button type="submit">Confirmar presença</button>
+  </form>
+</section>
+
+<script>
+  const radios = document.querySelectorAll('input[name="tem_acompanhante"]');
+  const container = document.getElementById('acompanhantes-container');
+  const list = document.getElementById('acompanhantes-list');
+  const addBtn = document.getElementById('add-acompanhante');
+  const principalInput = document.querySelector('input[name="principal"]');
+  const principalStatus = document.querySelector('[data-status-for="principal"]');
+
+  async function validateGuest(input, statusEl) {
+    const nome = input.value.trim();
+    if (!nome) {
+      statusEl.textContent = '';
+      statusEl.className = 'field-status';
+      return;
+    }
+    const res = await fetch(`/api/convidados/existe?nome=${encodeURIComponent(nome)}`);
+    const data = await res.json();
+    if (data.exists) {
+      statusEl.textContent = `✅ ${data.nome} está na lista`;
+      statusEl.className = 'field-status ok';
+    } else {
+      statusEl.textContent = '❌ Nome não encontrado na lista';
+      statusEl.className = 'field-status bad';
+    }
+  }
+
+  function addField() {
+    const wrap = document.createElement('div');
+    wrap.innerHTML = '<input name="acompanhantes" placeholder="Nome do acompanhante" /><small class="field-status"></small>';
+    const input = wrap.querySelector('input');
+    const status = wrap.querySelector('small');
+    input.addEventListener('blur', () => validateGuest(input, status));
+    list.appendChild(wrap);
+  }
+
+  principalInput.addEventListener('blur', () => validateGuest(principalInput, principalStatus));
+
+  radios.forEach((radio) => {
+    radio.addEventListener('change', () => {
+      if (radio.checked && radio.value === 'sim') {
+        container.classList.remove('hidden');
+        if (list.children.length === 0) addField();
+      }
+      if (radio.checked && radio.value === 'nao') {
+        container.classList.add('hidden');
+        list.innerHTML = '';
+      }
+    });
+  });
+
+  addBtn.addEventListener('click', addField);
+</script>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="card two-col">
+  <div>
+    <h2>Cadastro de convidados</h2>
+    <form method="post" class="form-grid">
+      <label>Nome completo <input name="nome" required></label>
+      <label>Telefone <input name="telefone"></label>
+      <label>Grupo/Família <input name="grupo"></label>
+      <button type="submit">Salvar convidado</button>
+    </form>
+  </div>
+  <div>
+    <h2>Lista de convidados</h2>
+    <table>
+      <thead><tr><th>Nome</th><th>Grupo</th><th>Status</th></tr></thead>
+      <tbody>
+      {% for c in convidados %}
+      <tr>
+        <td>{{ c.nome }}</td>
+        <td>{{ c.grupo }}</td>
+        <td>{{ 'Confirmado' if c.confirmado else 'Pendente' }}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
