@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import secrets
 import sqlite3
 from datetime import datetime
 from functools import wraps
@@ -30,7 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent
 DATABASE = BASE_DIR / "party.db"
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-change-me")
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY") or secrets.token_hex(32)
 
 login_manager = LoginManager()
 login_manager.login_view = "login"
@@ -120,9 +121,15 @@ def init_db():
 
     existing_admin = cursor.execute("SELECT id FROM users WHERE username = ?", ("admin",)).fetchone()
     if not existing_admin:
+        admin_password = os.getenv("ADMIN_INITIAL_PASSWORD")
+        if not admin_password:
+            db.close()
+            raise RuntimeError(
+                "ADMIN_INITIAL_PASSWORD must be set to initialize the default admin account."
+            )
         cursor.execute(
             "INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)",
-            ("admin", generate_password_hash("admin123"), "admin"),
+            ("admin", generate_password_hash(admin_password), "admin"),
         )
     db.commit()
     db.close()

@@ -14,6 +14,8 @@ Aplicação em **Python + Flask** para gerenciar:
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+export SECRET_KEY="$(python -c 'import secrets; print(secrets.token_hex(32))')"
+export ADMIN_INITIAL_PASSWORD="defina-uma-senha-forte"
 python app.py
 ```
 
@@ -23,7 +25,7 @@ Acesse:
 
 Usuário inicial:
 - usuário: `admin`
-- senha: `admin123`
+- senha: valor de `ADMIN_INITIAL_PASSWORD`
 
 ## Fluxo RSVP
 
