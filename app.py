@@ -32,6 +32,8 @@ DATABASE = BASE_DIR / "party.db"
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-change-me")
 
+_db_initialized = False
+
 login_manager = LoginManager()
 login_manager.login_view = "login"
 login_manager.init_app(app)
@@ -50,10 +52,19 @@ class User(UserMixin):
 
 
 def get_db() -> sqlite3.Connection:
+    ensure_database_initialized()
     if "db" not in g:
         g.db = sqlite3.connect(DATABASE)
         g.db.row_factory = sqlite3.Row
     return g.db
+
+
+def ensure_database_initialized():
+    global _db_initialized
+    if _db_initialized:
+        return
+    init_db()
+    _db_initialized = True
 
 
 @app.teardown_appcontext
@@ -368,5 +379,5 @@ def api_convidado_existe():
 
 
 if __name__ == "__main__":
-    init_db()
+    ensure_database_initialized()
     app.run(host="0.0.0.0", port=5000, debug=True)
