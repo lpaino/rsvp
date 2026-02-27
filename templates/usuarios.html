@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="card two-col">
+  <div>
+    <h2>Novo usuário</h2>
+    <form method="post" class="form-grid">
+      <label>Usuário <input name="username" required></label>
+      <label>Senha <input name="password" type="password" required></label>
+      <label>Nível
+        <select name="role">
+          <option value="admin">Admin</option>
+          <option value="organizador">Organizador</option>
+          <option value="consulta">Consulta</option>
+        </select>
+      </label>
+      <button type="submit">Cadastrar usuário</button>
+    </form>
+  </div>
+  <div>
+    <h2>Usuários cadastrados</h2>
+    <ul>
+      {% for user in users %}
+      <li>{{ user.username }} ({{ user.role }})</li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endblock %}

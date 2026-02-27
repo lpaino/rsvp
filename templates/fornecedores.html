@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="card two-col">
+  <div>
+    <h2>Cadastro de fornecedores</h2>
+    <form method="post" class="form-grid">
+      <label>Nome <input name="nome" required></label>
+      <label>Categoria <input name="categoria"></label>
+      <label>Contato <input name="contato"></label>
+      <label>Observações <textarea name="observacoes"></textarea></label>
+      <button type="submit">Salvar fornecedor</button>
+    </form>
+  </div>
+  <div>
+    <h2>Lista de fornecedores</h2>
+    <ul>
+      {% for f in fornecedores %}
+      <li><strong>{{ f.nome }}</strong> - {{ f.categoria }} - {{ f.contato }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endblock %}

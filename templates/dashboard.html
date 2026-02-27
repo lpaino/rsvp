@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="card">
+  <h2>Dashboard</h2>
+  <div class="stats">
+    <article><strong>{{ stats.total_convidados }}</strong><span>Convidados</span></article>
+    <article><strong>{{ stats.confirmados }}</strong><span>Confirmados</span></article>
+    <article><strong>{{ stats.fornecedores }}</strong><span>Fornecedores</span></article>
+  </div>
+  {% if festa %}
+  <h3>Última festa cadastrada</h3>
+  <p><strong>{{ festa.nome }}</strong> - {{ festa.data_evento }} - {{ festa.local }}</p>
+  <p>{{ festa.descricao }}</p>
+  {% else %}
+  <p>Nenhuma festa cadastrada ainda.</p>
+  {% endif %}
+</section>
+{% endblock %}
