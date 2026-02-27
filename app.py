@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import sqlite3
+import threading
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
@@ -33,6 +34,7 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-change-me")
 
 _db_initialized = False
+_db_init_lock = threading.Lock()
 
 login_manager = LoginManager()
 login_manager.login_view = "login"
@@ -63,8 +65,11 @@ def ensure_database_initialized():
     global _db_initialized
     if _db_initialized:
         return
-    init_db()
-    _db_initialized = True
+    with _db_init_lock:
+        if _db_initialized:
+            return
+        init_db()
+        _db_initialized = True
 
 
 @app.teardown_appcontext
@@ -129,12 +134,10 @@ def init_db():
         """
     )
 
-    existing_admin = cursor.execute("SELECT id FROM users WHERE username = ?", ("admin",)).fetchone()
-    if not existing_admin:
-        cursor.execute(
-            "INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)",
-            ("admin", generate_password_hash("admin123"), "admin"),
-        )
+    cursor.execute(
+        "INSERT OR IGNORE INTO users (username, password_hash, role) VALUES (?, ?, ?)",
+        ("admin", generate_password_hash("admin123"), "admin"),
+    )
     db.commit()
     db.close()
 
